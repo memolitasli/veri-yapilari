@@ -1,0 +1,2 @@
+# veri-yapilari
+ders içerigi
