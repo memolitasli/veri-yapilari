@@ -1,0 +1,236 @@
+l#include <stdio.h>
+#include <stdlib.h>
+struct n{
+    int x;
+    struct n * next;
+};
+typedef struct  n node;
+
+void bastir(node * r)
+{
+    while(r != NULL)
+    {
+
+        printf("%d \n",r->x);
+        r = r->next;
+    }
+
+}
+node * eklesirali(node *r,int x) // fonksiyonun geri dönüþ tipinin node *
+// olmasýnýn sebebi fonksiyonun içerisinde root deðiþebiliyor ama fonktan çýkýp
+// maine döndüðünde benim rootum baþlangiçtaki deðer ile ayni
+// oluyor bunu engellemek için geri dönüþ deðerini void deðil
+// node * yaptým fonksiyoru çaðýrýrkende root = eklesirali(root,15 vs)
+//biçiminde çaðýracaðýum
+{
+    if(r == NULL) // baðlý listem boþ ise
+    {
+        r = (node *)malloc(sizeof(node));
+        r->next = NULL;
+        r->x = x;
+        return r;
+    }
+    node * iter = r;
+    while(iter->next != NULL && iter->x <x)
+    {
+     iter = iter->next;
+    }
+    node *temp = (node *)malloc(sizeof(node));
+    temp->next = iter->next;
+    iter->next = temp;
+    temp->x = x;
+
+
+    if(r->next == NULL) // baðlý listemde tek bir eleman var ise
+    {
+     if(r->x>x)
+     {
+         node * temp = (node *)malloc(sizeof(node));
+         temp->x = x;
+         temp->next = r;
+         r = temp;
+         return temp;
+     }
+    }
+    // son bir durum daha var eklenen deðer olan deðerden büyük veya eþit olmasý
+    else
+    {
+        node * temp = (node *)malloc(sizeof(node));
+        temp->x = x;
+        temp->next = NULL;
+        r->next = temp;
+        return r;
+    }
+}
+
+void daireselbastir(node *r)
+{
+    node * iter = r;
+    printf("%d",iter->x); // bunu burada bir kere bastýrmamýn
+    //sebebi baþlangýçta iter r ye eþit bu nedenle
+    //döngüye girmeyecek iteri bir kere elle yazdýrýp ilerlettikten sonra otomatik olarak kendisi
+    // döngü içerisinde iþlemleri halledecek
+    iter = iter->next;
+    while(iter!=r)
+    {
+
+        printf("%d",iter->x);
+        iter = iter->next;
+    }
+
+
+}
+
+void daireselekle(node * r,int x){
+node * iter = r;
+while(iter->next != r)
+{
+    iter = iter->next;
+}
+iter->next = (node *)malloc(sizeof(node));
+iter->next->x = x;
+iter->next->next = r;
+
+}
+node * daireseleklesirali(node *r,int x)
+{
+    if(r==NULL) // liste boþ ise
+    {
+        r = (node *)malloc(sizeof(node *));
+        r->next = r;
+        r->x = x;
+        return r;
+    }
+    if(r->x >x) // eklenen elemanýn küçük olmasý durumu
+    {
+        node * temp = (node *)malloc(sizeof(node));
+        temp->x = x;
+        temp->next = r;
+        node * iter =r;
+        while(iter->next!=r){
+            iter = iter->next;
+        }
+        iter->next = temp;
+        return temp;
+    }
+    // baðlý listede araya eklemede zaten sona ekleme iþlemi ile ayný o yüzden tekrar
+    // yazmýyorum
+}
+
+node * sil(node * r, int x)
+{
+    node * temp;
+    node * iter = r;
+    if(r->x == x)
+    {
+
+        temp = r;
+        r = r->next;
+        free(temp);
+        return r;
+    }
+    while(iter->next != NULL && iter->next->x != x)
+    {
+        iter = iter->next;
+    }
+    if(iter->next == NULL)
+    {
+        printf("Aranan Sayi Bulunamadi...\n");
+        return r;
+    }
+    temp = iter->next;
+    iter->next = iter->next->next;
+    free(temp);
+    return r;
+}
+
+int main()
+{
+    node * root;
+    root = (node *)malloc(sizeof(node));
+    //?imdi nodelary elimle kendim olu?turup içlerine verileri ataca?ym daha sonra bu i?lemi döngü kullanarak yapaca?ym
+    root->x = 10;
+    root->next = (node *)malloc(sizeof(node));
+    root->next->x = 20;
+    root->next->next = (node *)malloc(sizeof(node));
+    root->next->next->x = 30;
+    root->next->next->next = NULL;
+     // bu ?ekilde elle yazmak oldukça zor oluyor bu nedenle iter ady verilen node * tipindde bir pointer daha olu?turuyorum
+     node * iter;
+     iter = root;
+     // hem root hemde iter ayny yeri gösteriyor
+     printf("%d",iter->x);
+     iter = iter->next; // bir sonraki kutuya geçtim
+     printf("%d",iter->x);
+
+     // ?imdi de döngüler ile ba?ly liste olu?turmaya geçiyorum
+
+     iter = root; //önce iteri listemin en ba?yna alyyorum
+     //ba?ly listemin en son elemanyndan sonra null bulundu?u için döngüde null geldi?i zaman durmasyny istiyorum
+
+     while(iter->next != NULL)
+    {
+        printf("%d \n",iter->x);
+        iter = iter->next; // bunu bu ?ekilde çaly?tyrdy?ym zaman hata aliyorum çünkü ramde NULL olarak
+        //kontrol etti?im kysym null olmayabilir bu nedenle yukaryda kendim null atamasy
+        // yapyyorum
+       // bu sefer düzgün çaly?acaktyr
+       // bunun olmamasy i,çin ileride döngülerle node olu?tururken next elemanyn gösterdi?i elemany null atayaca?yz
+       // ancak bu ?ekilde iter null oldu?u zaman (iter != NULL) iter en sonda null olmu? olacak
+       // ve ben daha sonra bu listemin içine elaman ekleyemem
+       //bunun olmamasy içinde kontrolümü while(iter != NULL ) olarak de?ilde while(iter->next != NULL) olarak
+       // de?i?tirmem lazym artyk listemin sonuna eleman ekleyebilirim
+    }
+    printf("\n");
+    for(int i = 0;i<5;i++)
+    {
+
+        iter->next = (node *)malloc(sizeof(node));
+        iter = iter->next;
+        iter->x = i*10;
+        iter->next = NULL;
+    }
+    // ?imdi yukaryda bir tanede fonksiyon yazalym linkedlist i alyp
+    // bana bastyran bir fonksiyon
+    bastir(root);
+
+    // þimdi de baðlý listede aralara veri eklemeye bakalým
+    //örneðin benim baðlý listemdeki 10 ve 20 arasýna veri ekleyelim
+    //yapmam gerekenler
+    //öncelikle ekleme yapýlacak aralýðýn solundaki elemanda dumam lazým çünkü
+    //saða geçersem geriye dönme þansým yok
+    iter = root;
+    for(int i = 0;i<3;i++)
+    {
+        iter = iter->next;
+
+    }
+    node * temp = (node *)malloc(sizeof(node));
+    temp->next = iter->next;
+    iter->next = temp;
+    temp->x = 400;
+    bastir(root);
+
+    printf("******************************\n");
+// þimdi de sýralý ekleme yapan bir fonksiyon yazalým
+//eðer eklenen eleman küçükse sola büyükse saða eklensin
+
+root = eklesirali(root,17);
+root = eklesirali(root,27);
+root = eklesirali(root,7);
+root = eklesirali(root,35);
+root = eklesirali(root,5000);
+    bastir(root);
+
+   // þimdi sýra dairesel baðlý listelere geldi
+   // normal baðlý listeleribn sonunda NULL deðer vardýr
+   //dairesel baglý listede ise son eleman null deðil ilk elemaný gösterir
+   //dairesel baðlý listelerde bir elemaný ararken o eleman yoksa sonsuz döngüye girer
+   //bunu nasýlengelleyeceðiz peki
+   //þöyle ki iter->next = root olduðunda
+   //ben anlayacaðým ki listemin en baþýna dönmüþüm
+
+
+
+    return 0;
+}
